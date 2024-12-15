@@ -7,7 +7,7 @@
 
 ## Demo
 
-Try randomize button [here](https://darosh.github.io/gridy-avatars/dist/).
+Try online version [here](https://ratogbm.github.io/gridy-avatars/dist/downloadable.html).
 
 ## Usage
 
