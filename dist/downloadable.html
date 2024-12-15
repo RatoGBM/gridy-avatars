@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Gridy Avatars</title>
+    </head>
+    <body>
+        <div id="custom-generator">
+            <div id="instructions">Doubleclick avatars to download them!</div>
+            <select id="shape">
+                <option value="0">Round</option>
+                <option value="1">Cross</option>
+                <option value="2">Cone</option>
+                <option value="3">X</option>
+                <option value="4">Cup</option>
+                <option value="5">Hexagon</option>
+                <option value="6">Bulb</option>
+                <option value="7">Helmet</option>
+            </select>
+            <select id="color">
+                <option value="0">Blue</option>
+                <option value="1">Lightblue</option>
+                <option value="2">Cyan</option>
+                <option value="3">Green</option>
+                <option value="4">Yellow</option>
+                <option value="5">Orange</option>
+                <option value="6">Red</option>
+                <option value="7">Red</option>
+            </select>
+            <select id="eyes">
+                <option value="0">Round</option>
+                <option value="1">X</option>
+                <option value="2">Glasses</option>
+                <option value="3">Cyclop</option>
+                <option value="4">Sunglasses</option>
+                <option value="5">Alien</option>
+                <option value="6">Evil</option>
+                <option value="7">Vizor</option>
+            </select>
+            <select id="eye-color">
+                <option value="0">Purple</option>
+                <option value="1">Darkblue</option>
+                <option value="2">Blue</option>
+                <option value="3">Lightblue</option>
+                <option value="4">Cyan</option>
+                <option value="5">Green</option>
+                <option value="6">Lightgreen</option>
+                <option value="7">White</option>
+            </select>
+            <select id="mouth">
+                <option value="0">Happy</option>
+                <option value="1">Sad</option>
+                <option value="2">Circle</option>
+                <option value="3">Happy Drolling</option>
+                <option value="4">Grill</option>
+                <option value="5">Pig</option>
+                <option value="6">Teeth</option>
+                <option value="7">Sad Drolling</option>
+            </select>
+            <select id="mouth-color">
+                <option value="0">Purple</option>
+                <option value="1">Darkblue</option>
+                <option value="2">Blue</option>
+                <option value="3">Lightblue</option>
+                <option value="4">Cyan</option>
+                <option value="5">Green</option>
+                <option value="6">Lightgreen</option>
+                <option value="7">White</option>
+            </select>
+            <input type="text" id="custom-seed" pattern="^[0-7]{6}$" value="123456" placeholder="123456" />
+            <button id="custom-generate-button" onclick="customGenerate()">Generate</button>
+            <button onclick="download(custom_seed.value)">Download</button>
+            <button onclick="generateMore(20)">More Random!</button>
+        </div>
+        <div id="avatar-list">
+        </div>
+        <script src="./avatars.js"></script>
+        <script>
+            const avatar_list = document.getElementById("avatar-list");
+            const custom_seed = document.getElementById("custom-seed");
+            function download(seed){
+                let av = document.getElementById(seed);
+                if (av==null){
+                    av = avatars.outer(seed.toString());
+                } else {
+                    av = av.innerHTML; // id is on the wrapper
+                }
+                const blob = new Blob([av], {type: 'image/svg+xml;charset=utf-8"'});
+                const svgUrl = URL.createObjectURL(blob);
+                let downloadlink = document.createElement("a");
+                downloadlink.href = svgUrl
+                downloadlink.download = seed+".svg"
+                document.body.appendChild(downloadlink);
+                downloadlink.click();
+                document.body.removeChild(downloadlink);
+            }
+            function generate(seed=avatars.random()){
+                let new_av = avatars.outer(seed);
+                let new_av_wrapper = document.createElement("div");
+                new_av_wrapper.innerHTML = new_av;
+                new_av_wrapper.className = "avatar";
+                new_av_wrapper.id = seed;
+                avatar_list.insertBefore(new_av_wrapper,avatar_list.children[0]);
+                new_av_wrapper.addEventListener("click",function(event){
+                    custom_seed.value = seed;
+                    if (event.detail==2){ //only on doubleclicks
+                        download(seed);
+                    }
+                })
+            }
+            function customGenerate(){
+                let seed = custom_seed.value;
+                if (/^[0-7]{6}$/.test(seed)){
+                } else { alert("Only 6 digits 0-7 allowed.\nWrong: 097804 - 8 and 9 not allowed!\nRight: 777777\nRight: 632451"); return; }
+                generate(seed);
+            }
+            function generateMore(n){
+                for (let i=0; i<n; i++){
+                    generate();
+                }
+            }
+            // background
+            const BACKGROUND_AVATARS = 40;
+            generateMore(BACKGROUND_AVATARS);
+            custom_seed.value = avatars.random();
+            document.querySelectorAll("select").forEach(function(value,i) {
+                value.value = custom_seed.value.slice(i,i+1);
+                value.addEventListener("change",function(){
+                    custom_seed.value = custom_seed.value.slice(0,i) + value.value + custom_seed.value.slice(i+1);
+                });
+            });
+            customGenerate();
+        </script>
+        <style>
+            #instructions {
+                font-family: Arial, serif;
+            }
+            body {
+                margin: 0;
+            }
+            #avatar-list{
+                display: flex;
+                flex-wrap: wrap;
+                flex-direction: row;
+                padding-top: 6em;
+            }
+            #avatar-list div:nth-child(1) {
+                border: 0.1em solid red;
+            }
+            .avatar {
+                box-sizing: border-box;
+                width: calc((100vw - 1em) / 8);
+            }
+            #custom-generator {
+                position: fixed;
+                padding: 1em;
+            }
+            button {
+                border-radius: 1em;
+                padding: 1em;
+            }
+        </style>
+    </body>
+</html>
